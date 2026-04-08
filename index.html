@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Regional Airport CEO 1982</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="hud">
+  <!-- VIEWPORT (full bleed) -->
+  <div id="viewport">
+    <canvas id="vp-base"></canvas>
+    <canvas id="vp-overlay"></canvas>
+    <div id="vp-tier">TIER 1 — SMALL REGIONAL</div>
+    <div id="vp-construction" style="display:none" aria-live="polite"><span class="vp-construction-text">Under construction</span><span class="vp-construction-sub">See timeline at lower left</span></div>
+    <div id="vp-loading">Loading airport view...</div>
+  </div>
+
+  <!-- LEFT ICON RAIL -->
+  <div id="icon-rail">
+    <div class="rail-group">
+      <div class="rail-btn" data-panel="terminal" title="Terminal"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="6" width="12" height="8" rx="1" stroke="#6a8a9a" stroke-width="1.2"/><path d="M4 6V4a4 4 0 018 0v2" stroke="#6a8a9a" stroke-width="1.2"/></svg></div>
+      <div class="rail-btn" data-panel="parking" title="Parking"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#6a8a9a" stroke-width="1.2"/><text x="8" y="11.5" text-anchor="middle" fill="#6a8a9a" font-size="9" font-weight="500">P</text></svg></div>
+      <div class="rail-btn" data-panel="concessions" title="Concessions"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="9" r="4" stroke="#6a8a9a" stroke-width="1.2"/><path d="M6 5L8 2l2 3" stroke="#6a8a9a" stroke-width="1.2"/></svg></div>
+      <div class="rail-btn" data-panel="facilities" title="Facilities"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 8H12V14H4V8H2L8 2Z" stroke="#6a8a9a" stroke-width="1.2"/></svg></div>
+    </div>
+    <div class="rail-group">
+      <div class="rail-btn" data-panel="staff" title="Staff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="2.5" stroke="#6a8a9a" stroke-width="1.2"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#6a8a9a" stroke-width="1.2"/></svg></div>
+      <div class="rail-btn" data-panel="consultants" title="Consultants"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" stroke="#6a8a9a" stroke-width="1.2"/><line x1="5.5" y1="5" x2="10.5" y2="5" stroke="#6a8a9a" stroke-width="1"/><line x1="5.5" y1="7.5" x2="10.5" y2="7.5" stroke="#6a8a9a" stroke-width="1"/></svg></div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="rail-group">
+      <div class="rail-btn" data-panel="negotiations" title="Negotiations"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 10l3-3 3 3 4-6" stroke="#6a8a9a" stroke-width="1.2"/><circle cx="14" cy="4" r="1.5" stroke="#6a8a9a" stroke-width="1"/></svg></div>
+      <div class="rail-btn" data-panel="finance" title="Finance"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#6a8a9a" stroke-width="1.2"/><text x="8" y="11" text-anchor="middle" fill="#6a8a9a" font-size="9" font-weight="500">$</text></svg></div>
+    </div>
+  </div>
+
+  <!-- FLYOUT PANEL -->
+  <div id="flyout" style="display:none">
+    <div id="flyout-title"></div>
+    <div id="flyout-items"></div>
+  </div>
+
+  <!-- TOP CENTER: Name + Tier + Play + Date -->
+  <div id="hud-top-center">
+    <div class="hud-chip"><span style="font-weight:500;font-size:13px;color:#e0e8f0">✈ Millbrook Regional</span><span style="color:#6a8a9a;font-size:11px" id="s-size">Tier 1</span></div>
+    <div class="hud-chip" id="pause-btn" onclick="togglePause()" style="cursor:pointer"><span id="play-icon" style="color:#4ae0a0;font-size:11px;font-weight:500">⏸ PAUSED</span></div>
+    <div class="hud-chip"><span style="color:#6a8a9a;font-size:11px" id="d-date">January 1, 1982</span></div>
+  </div>
+
+  <!-- TOP RIGHT: Cash + Net Revenue (hover for full financials) -->
+  <div id="hud-top-right">
+    <div id="cash-fin-wrap" tabindex="0" aria-describedby="cash-fin-popover" title="Hover for revenue &amp; expense breakdown">
+      <div id="m-cash" style="font-size:22px;font-weight:500;color:#4ae0a0;letter-spacing:.5px">$250,000</div>
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:2px">
+        <span style="font-size:11px;color:#6a8a9a">today</span>
+        <span id="s-net" style="font-size:12px;font-weight:500;padding:1px 8px;border-radius:4px">+$0</span>
+      </div>
+      <div id="cash-fin-bridge" aria-hidden="true"></div>
+      <div id="cash-fin-popover" role="tooltip">
+        <div class="cash-fin-title">Daily financials</div>
+        <div id="rev-box" class="brkbox cash-fin-box">
+          <div class="shead">Revenue</div>
+          <div class="brkrow"><span class="key">Heartland Air</span><span class="val" id="rb-ha"></span></div>
+          <div id="rb-me-row" class="brkrow" style="display:none"><span class="key">Other carriers</span><span class="val" id="rb-me"></span></div>
+          <div class="brkrow"><span class="key">Parking</span><span class="val" id="rb-park"></span></div>
+          <div class="brkrow"><span class="key">Concessions</span><span class="val" id="rb-conc"></span></div>
+          <div class="brkrow" id="rb-trans-row"><span class="key">Ground transport</span><span class="val" id="rb-transport"></span></div>
+          <div class="brkrow"><span class="key">Passenger facility charge</span><span class="val" id="rb-pfc"></span></div>
+          <div class="brkrow"><span class="key">Valet</span><span class="val" id="rb-valet"></span></div>
+          <div class="brkrow brktot"><span class="key">Total revenue</span><span class="val" id="rb-tot"></span></div>
+        </div>
+        <div id="exp-box" class="brkbox cash-fin-box">
+          <div class="shead">Expenses</div>
+          <div class="brkrow"><span class="key">Staff</span><span class="val" id="eb-staff"></span></div>
+          <div class="brkrow"><span class="key">Operations</span><span class="val" id="eb-ops"></span></div>
+          <div class="brkrow"><span class="key">Loan interest</span><span class="val" id="eb-int"></span></div>
+          <div id="eb-lob-row" class="brkrow" style="display:none"><span class="key">Lobbyist retainer</span><span class="val" id="eb-lob"></span></div>
+          <div class="brkrow brktot"><span class="key">Total expenses</span><span class="val" id="eb-tot"></span></div>
+        </div>
+        <div class="brkbox cash-fin-foot">
+          <div class="brkrow"><span class="key">Outstanding loan</span><span class="val" id="s-loan"></span></div>
+          <div class="brkrow" style="margin-top:2px;border-top:none;padding-top:0"><span class="key">Loan rate (APR)</span><span class="val" id="s-lrate"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSTRUCTION TIMELINE (visible when projects active) -->
+  <div id="hud-builds" style="display:none">
+    <div class="hud-builds-title">Construction</div>
+    <div id="build-list"></div>
+  </div>
+
+  <!-- BOTTOM LEFT: Core Stats -->
+  <div id="hud-bottom-left">
+    <div class="hud-stat"><div class="hud-stat-label">Pax/day</div><div class="hud-stat-value" id="m-pax">0</div></div>
+    <div class="hud-stat flights-stat-wrap" id="flights-wrap" tabindex="0" aria-describedby="flights-routes-popover" title="Hover for cities served by airline">
+      <div class="hud-stat-label">Flights</div>
+      <div class="hud-stat-value" id="m-flights">5</div>
+      <div id="flights-routes-bridge" aria-hidden="true"></div>
+      <div id="flights-routes-popover" role="tooltip">
+        <div class="flights-routes-title">Cities by airline</div>
+        <div id="routes-panel"></div>
+      </div>
+    </div>
+    <div class="hud-stat"><div class="hud-stat-label">Delay</div><div class="hud-stat-value" id="m-delay">0%</div></div>
+    <div class="hud-stat"><div class="hud-stat-label">Credit</div><div class="hud-stat-value" id="m-credit">C</div></div>
+  </div>
+
+  <!-- BOTTOM RIGHT: Utilization Bars -->
+  <div id="hud-bottom-right">
+    <div class="util-row"><span class="util-label">Pkg</span><div class="util-track"><div class="util-fill" id="bar-park" style="width:0%"></div></div><span class="util-val" id="bar-park-lbl">0/20</span></div>
+    <div class="util-row"><span class="util-label">Gate</span><div class="util-track"><div class="util-fill" id="bar-gate" style="width:0%"></div></div><span class="util-val" id="bar-gate-lbl">0 pax</span></div>
+    <div class="util-row" id="sat-trigger" style="cursor:pointer"><span class="util-label">Sat</span><div class="util-track"><div class="util-fill" id="bar-sat" style="width:60%"></div></div><span class="util-val" id="bar-sat-lbl">60/100</span></div>
+  </div>
+
+  <!-- SAT POPOVER -->
+  <div id="sat-popover" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:11px;font-weight:500;color:#f0a040">AIRLINE SATISFACTION</span><span id="sat-close" style="font-size:12px;color:#6a8a9a;cursor:pointer;padding:2px 4px">✕</span></div>
+    <div id="sat-status" style="font-size:12px;font-weight:500;color:#e0e8f0;margin-bottom:10px"></div>
+    <div style="font-size:9px;color:#6a8a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Hurting it right now</div>
+    <div id="sat-bad" style="font-size:11px;color:#8aa0a8;margin-bottom:10px"></div>
+    <div style="font-size:9px;color:#6a8a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">How to improve it</div>
+    <div id="sat-good" style="font-size:11px;color:#4ae0a0;line-height:1.6"></div>
+    <div style="position:absolute;bottom:-6px;right:60px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid rgba(10,20,30,.92)"></div>
+  </div>
+
+  <!-- BOTTOM TICKER -->
+  <div id="ticker"><div id="ticker-track"></div></div>
+
+  <!-- ALERTS OVERLAY -->
+  <div id="alert-sec" style="display:none"></div>
+  <div id="alert-float" style="display:none"><div id="alert-list"></div></div>
+</div>
+
+<!-- Hidden data spans (game.js references these) -->
+<div style="display:none">
+  <span id="s-park-cap"></span><span id="s-park-price"></span><span id="s-gate-cap"></span>
+  <span id="s-staff"></span><span id="s-concessions"></span><span id="s-facilities"></span>
+  <span id="s-lobby"></span><span id="s-lfee"></span><span id="s-pfc"></span>
+  <span id="s-rev"></span><span id="s-exp"></span>
+  <span id="s-days"></span><span id="milestone-text"></span>
+  <span id="t-cash"></span><span id="t-pax"></span><span id="t-flights"></span>
+  <span id="t-delay"></span><span id="t-sat"></span><span id="t-credit"></span>
+  <span id="m-sat"></span>
+  <div id="rev-tog"></div><div id="exp-tog"></div>
+  <div id="flight-board-wrap"><div id="flight-board"></div></div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal" style="display:none">
+  <div class="modal">
+    <div class="mhead"><h3 id="modal-title">Options</h3><button class="xbtn" onclick="closeModal()">X</button></div>
+    <div class="mbody" id="modal-body"></div>
+    <div class="mfoot"><button onclick="closeModal()">Cancel</button><button class="primary" id="modal-confirm" onclick="confirmModal()">Confirm</button></div>
+  </div>
+</div>
+
+<div id="gameover" style="display:none">
+  <div class="box"><h2>BANKRUPTCY</h2><p id="go-body"></p><button onclick="location.reload()">Try Again</button></div>
+</div>
+
+<script src="game.js"></script>
+<script>
+// === HUD RAIL INTERACTION ===
+var flyoutData={
+  terminal:{title:'Terminal',items:[{label:'Add Gate / Boarding Area',action:function(){openModal("gate")}}]},
+  parking:{title:'Parking',items:[{label:'Add Parking Lot',action:function(){openModal("parking")}},{label:'Set Parking Price',action:function(){openModal("parking-price")}},{label:'Ground transport & access…',action:function(){openModal("transport")}}]},
+  concessions:{title:'Concessions',items:[{label:'Add Concessions',action:function(){openModal("concessions")}}]},
+  facilities:{title:'Facilities',items:[{label:'Airport Facilities',action:function(){openModal("facilities")}}]},
+  staff:{title:'Staff',items:[{label:'Hire Ground Staff',action:function(){openModal("staff")}}]},
+  consultants:{title:'Consultants',items:[{label:'Political Lobbyist',action:function(){openModal("lobbyist")}}]},
+  negotiations:{title:'Negotiations',items:[{label:'Heartland Air (You Initiate)',action:function(){openHANego()}},{label:'Bank Financing',action:function(){openBankNego()}}]},
+  finance:{title:'Finance',items:[{label:'Take Bank Loan',action:function(){takeLoan()}},{label:'Repay Loan ($10k)',action:function(){repayLoan()}}]}
+};
+var activePanel=null;
+document.querySelectorAll('.rail-btn').forEach(function(btn){
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var panel=btn.getAttribute('data-panel'),flyout=document.getElementById('flyout');
+    document.getElementById('sat-popover').style.display='none';
+    if(activePanel===panel){flyout.style.display='none';btn.classList.remove('active');activePanel=null;return;}
+    document.querySelectorAll('.rail-btn').forEach(function(b){b.classList.remove('active')});
+    btn.classList.add('active');activePanel=panel;
+    var data=flyoutData[panel];
+    document.getElementById('flyout-title').textContent=data.title;
+    var el=document.getElementById('flyout-items');el.innerHTML='';
+    data.items.forEach(function(item){
+      var d=document.createElement('div');d.textContent=item.label;d.className='flyout-item';
+      d.addEventListener('click',function(){flyout.style.display='none';btn.classList.remove('active');activePanel=null;item.action();});
+      el.appendChild(d);
+    });
+    var r=btn.getBoundingClientRect(),h=document.getElementById('hud').getBoundingClientRect();
+    flyout.style.top=Math.round(r.top-h.top)+'px';flyout.style.display='block';
+  });
+});
+document.getElementById('sat-trigger').addEventListener('click',function(e){
+  e.stopPropagation();var p=document.getElementById('sat-popover');
+  document.getElementById('flyout').style.display='none';
+  document.querySelectorAll('.rail-btn').forEach(function(b){b.classList.remove('active')});activePanel=null;
+  p.style.display=p.style.display==='none'?'block':'none';
+});
+document.getElementById('sat-close').addEventListener('click',function(e){e.stopPropagation();document.getElementById('sat-popover').style.display='none';});
+document.getElementById('hud').addEventListener('click',function(){
+  document.getElementById('flyout').style.display='none';document.getElementById('sat-popover').style.display='none';
+  document.querySelectorAll('.rail-btn').forEach(function(b){b.classList.remove('active')});activePanel=null;
+});
+</script>
+</body>
+</html>
